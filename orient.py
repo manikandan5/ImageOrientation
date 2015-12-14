@@ -1,10 +1,21 @@
+#Authors : Manikandan Murugesan, Debasis Dwivedy
+
+#Report
+"""
+    We have successfully implemented the KNN algorithm and Neural Networks algorithm.
+    KNN algorithm though takes a lot of time to run gives us approximately 69% accuracy when learned from the whole test date
+    While our Neural Networks gives us an accuracy of 40%
+    For our best algorithm, we have converted the RGB vectors to monochrome vectors using formulas and then iterated on them, so that the time is lowered considerably.
+    As far as KNN is concerned, we have observed that the accuracy doesn't vary that much for the values of K.
+    More details in the report
+"""
 import sys
 import numpy as np
 import math
 import random
 import time
 
-
+#Intialisation Data
 trainData = {}
 trainOri = {}
 testOri = {}
@@ -13,18 +24,19 @@ correctOri = {}
 tempData = {}
 deviationData = {}
 
+#Checking for Inputs
 if len(sys.argv) != 5:
     print "Usage: python orient.py train_file.txt test_file.txt mode value"
     sys.exit()
 
-
+#Reading the inputs
 trainFile = sys.argv[1]
 testFile = sys.argv[2]
 mode = sys.argv[3]
 k = int(sys.argv[4])
 hidden_count = int(sys.argv[4])
 
-
+#Function to add two matrices
 def matrix_add(A,B):
     Z = []
     for i in range(len(A)):
@@ -34,6 +46,7 @@ def matrix_add(A,B):
         Z.append(row)
     return Z
 
+#Reading file from Training Data for KNN
 def ReadTrainData(fName):
 
     file = open(fName, 'r')
@@ -45,6 +58,7 @@ def ReadTrainData(fName):
         imgVec = [int(i) for i in imgData[2:194]]
         trainData[imgFile+"-"+trainOri[imgFile]] = np.array(imgVec)
 
+#Reading file from Test Data for KNN
 def ReadTestData(fName):
 
     file = open(fName, 'r')
@@ -57,6 +71,7 @@ def ReadTestData(fName):
         testData[imgFile] = np.array(imgVec)
         tempData[imgFile] = 10000000
 
+#KNN Algorithm run
 def KNNRun():
     i = 0
     for testImg in testData:
@@ -75,7 +90,8 @@ def KNNRun():
                 deviation = math.sqrt(deviation)
 
                 deviationData[trainImg+"-"+ori] = deviation
-
+    
+    #Learning from all the orientations of the image
         count = 0
         orientationCount = {0:0, 90:0, 180:0, 270:0 }
         for w in sorted(deviationData, key=deviationData.get, reverse=False):
@@ -92,6 +108,7 @@ def KNNRun():
                 count = count+1
         testOri[testImg] = sorted(orientationCount, key =orientationCount.get, reverse=True)[0]
 
+#Calculating Confusion Matrix for KNN
 def ConfusionMatrixCalculation():
     confusion_matrix1=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
@@ -146,6 +163,7 @@ def ConfusionMatrixCalculation():
         confusion_matrix1=matrix_add(confusion_matrix1,predicted_matrix)
     return confusion_matrix1
 
+#Calculating the accuracy for KNN
 def AccuracyCalculation():
     correct = 0
     count = 0
@@ -169,6 +187,7 @@ def AccuracyCalculation():
         print
         i=i+1
 
+#Writing output to the file
 def FileWrite():
     file = open("knn output.txt",'w')
     for image in testOri:
@@ -176,6 +195,7 @@ def FileWrite():
         file.write(line)
     file.close()
 
+#KNN Main call
 def KNN():
     ReadTrainData(trainFile)
     ReadTestData(testFile)
@@ -183,6 +203,7 @@ def KNN():
     AccuracyCalculation()
     FileWrite()
 
+#Code for Neural Networks
 class NeuralNetwork:
     LEARNING_RATE = 0.5
 
@@ -388,6 +409,28 @@ def file_write(solution):
             file.write("\n")
         file.close()
 
+def Best():
+    file = open(testFile, 'r')
+    vec = []
+    for line in file:
+        imgData = line.split()
+        imgFile = imgData[0]
+        correctOri[imgFile] = imgData[1]
+        imgVec = [int(i) for i in imgData[2:194]]
+        for values in range(len(imgVec)/3):
+            r=imgVec[0]
+            imgVec.remove(imgVec[0])
+            g=imgVec[0]
+            imgVec.remove(imgVec[0])
+            b=imgVec[0]
+            imgVec.remove(imgVec[0])
+            mono = (0.2125 * r) + (0.7154 * g) + (0.0721 * b)
+            vec.append(mono)
+        testData[imgFile] = np.array(vec)
+        tempData[imgFile] = 10000000
+    k=3
+    KNN()
+    return
 
 def NNET():
     ##############  The Main Function#####################################################
@@ -501,10 +544,7 @@ def NNET():
     end=time.time()
     print end-start
 
-def Best():
-    k=3
-    KNN()
-    return
+
 
 if mode == "best":
     Best()
