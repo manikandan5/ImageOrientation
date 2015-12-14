@@ -7,6 +7,8 @@
     While our Neural Networks gives us an accuracy of 40%
     For our best algorithm, we have converted the RGB vectors to monochrome vectors using formulas and then iterated on them, so that the time is lowered considerably.
     As far as KNN is concerned, we have observed that the accuracy doesn't vary that much for the values of K.
+    Currently for Best, we are generating the test data every time by reading from the file and processing it.
+    For improvement, we could just write it into the file the first time and then read it from the file later on.
     More details in the report
 """
 import sys
